@@ -35,7 +35,6 @@ const authMiddleware = (req, res, next) => {
 };
 
 const adminLogin = async (req, res) => {
-  console.log(req.user);
   try {
     const { email, password } = req.body;
     console.log("api hitted");
