@@ -99,6 +99,6 @@ const adminLogin = async (req, res) => {
   }
 };
 
-const adminLogout = async (req, res) => {};
+
 
 module.exports = { authMiddleware, adminLogin };

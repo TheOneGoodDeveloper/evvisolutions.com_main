@@ -1,24 +1,24 @@
-const nodemailer = require('nodemailer');
-const dotenv = require('dotenv');
+const nodemailer = require("nodemailer");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  host: process.env['EMAIL_HOST'],
-  port: process.env['EMAIL_PORT'],
+  host: process.env["EMAIL_HOST"],
+  port: process.env["EMAIL_PORT"],
   secure: true,
-  
+
   auth: {
-    user: process.env['EMAIL_USER'],
-    pass: process.env['EMAIL_PASS'],
+    user: process.env["EMAIL_USER"],
+    pass: process.env["EMAIL_PASS"],
   },
 });
 
- const SendEmail = (result) => {
+const SendEmail = (result) => {
   return new Promise((resolve, reject) => {
     console.log(result);
     const mailOptions = {
-      to: process.env['EMAIL_TO'],
+      to: process.env["EMAIL_TO"],
       from: result.email,
       subject: `${result.subject}`,
       // text: "hello",
@@ -76,7 +76,7 @@ const transporter = nodemailer.createTransport({
 </html>
 `,
     };
-    console.log("email send")
+    console.log("email send");
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         reject(error);
@@ -87,4 +87,11 @@ const transporter = nodemailer.createTransport({
   });
 };
 
-module.exports = SendEmail;
+const sendMailforResetPassword =async () => {
+  return new Promise((resolve, reject) => {
+
+  })
+  
+}
+
+module.exports = {SendEmail,sendMailforResetPassword};

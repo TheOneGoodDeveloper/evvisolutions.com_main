@@ -56,7 +56,7 @@ const getBlogById = async (req, res) => {
     if (blog.length === 0) {
       return res.status(404).json({ status: false, message: "Blog not found" });
     }
-    res.status(200).json({ status: true, blog: blog[0] });
+    res.status(200).json({ status: true, blog });
   } catch (error) {
     res
       .status(500)
@@ -66,6 +66,7 @@ const getBlogById = async (req, res) => {
 
 // UPDATE BLOG
 const updateBlog = async (req, res) => {
+  console.log(req.file);
   try {
     const { id, title, body, author } = req.body;
     const newImage = req.file ? req.file.filename : null;
@@ -143,6 +144,20 @@ const deleteBlog = async (req, res) => {
       .json({ status: false, message: "Internal server error", error });
   }
 };
+const latestBlogs = async (req, res) => {
+  try {
+    const blogs = await BlogModel.getLatestBlog();
+    // console.log(blogs); // Adjusted to get the latest blog
+    if (blogs.length === 0) {
+      return res.status(404).json({ status: false, message: "No blogs found" });
+    }
+    res.status(200).json({ status: true, blogs });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: false, message: "Internal server error", error });
+  }
+};
 
 module.exports = {
   createBlog,
@@ -150,4 +165,5 @@ module.exports = {
   getBlogById,
   updateBlog,
   deleteBlog,
+  latestBlogs
 };
