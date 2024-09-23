@@ -24,6 +24,11 @@ const {
 } = require("../Controller/Blog_controller.js");
 
 const{requestPasswordReset,resetPassword} = require("../Controller/Auth_controller.js")
+const {
+  updateContact,
+  getContacts,
+  deleteContact,
+} = require("../Controller/Contact_controller.js");
 
 // user Api's
 AdminRoute.post("/login", adminLogin);
@@ -44,7 +49,8 @@ AdminRoute.post(
 AdminRoute.delete("/deleteBlog/:id", authMiddleware, deleteBlog);
 
 // reset password
-AdminRoute.post("/request-password-reset",authMiddleware,requestPasswordReset)
+AdminRoute.post("/requestPasswordReset",authMiddleware,requestPasswordReset)
 AdminRoute.post("/reset-password",authMiddleware,resetPassword);
+AdminRoute.post("/getleads",authMiddleware,getContacts)
 
 module.exports = AdminRoute;

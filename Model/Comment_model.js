@@ -1,7 +1,7 @@
 const connection = require("../Model/db_Mysql");
 
 class commentModel {
-  static create(commentData, callback) {
+  static createComment(commentData, callback) {
     const query =
       "INSERT INTO comments (blog_id, comment, created_at) VALUES (?, ?, NOW())";
     connection.query(

@@ -25,11 +25,11 @@ const createBlog = async (req, res) => {
       author
     );
     console.log("Blog created successfully");
-    res
+    return res
       .status(201)
       .json({ status: true, message: "Blog created successfully" });
   } catch (error) {
-    res
+    return res
       .status(500)
       .json({ status: false, message: "Internal server error", error });
   }
@@ -40,9 +40,9 @@ const createBlog = async (req, res) => {
 const getAllBlogs = async (req, res) => {
   try {
     const blogs = await BlogModel.getAllBlogs();
-    res.status(200).json({ status: true, blogs });
+    return res.status(200).json({ status: true, blogs });
   } catch (error) {
-    res
+    return res
       .status(500)
       .json({ status: false, message: "Internal server error", error });
   }
@@ -56,9 +56,9 @@ const getBlogById = async (req, res) => {
     if (blog.length === 0) {
       return res.status(404).json({ status: false, message: "Blog not found" });
     }
-    res.status(200).json({ status: true, blog });
+    return res.status(200).json({ status: true, blog });
   } catch (error) {
-    res
+    return res
       .status(500)
       .json({ status: false, message: "Internal server error", error });
   }
@@ -66,7 +66,6 @@ const getBlogById = async (req, res) => {
 
 // UPDATE BLOG
 const updateBlog = async (req, res) => {
-  console.log(req.file);
   try {
     const { id, title, body, author } = req.body;
     const newImage = req.file ? req.file.filename : null;
@@ -100,12 +99,12 @@ const updateBlog = async (req, res) => {
       return res.status(404).json({ status: false, message: "Blog not found" });
     }
 
-    res
+    return res
       .status(200)
       .json({ status: true, message: "Blog updated successfully" });
   } catch (error) {
     console.log(error);
-    res
+    return res
       .status(500)
       .json({ status: false, message: "Internal server error", error });
   }
@@ -135,11 +134,11 @@ const deleteBlog = async (req, res) => {
       return res.status(404).json({ status: false, message: "Blog not found" });
     }
 
-    res
+    return res
       .status(200)
       .json({ status: true, message: "Blog deleted successfully" });
   } catch (error) {
-    res
+    return res
       .status(500)
       .json({ status: false, message: "Internal server error", error });
   }
@@ -151,9 +150,9 @@ const latestBlogs = async (req, res) => {
     if (blogs.length === 0) {
       return res.status(404).json({ status: false, message: "No blogs found" });
     }
-    res.status(200).json({ status: true, blogs });
+    return res.status(200).json({ status: true, blogs });
   } catch (error) {
-    res
+    return res
       .status(500)
       .json({ status: false, message: "Internal server error", error });
   }
@@ -165,5 +164,5 @@ module.exports = {
   getBlogById,
   updateBlog,
   deleteBlog,
-  latestBlogs
+  latestBlogs,
 };

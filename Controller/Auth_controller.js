@@ -1,76 +1,117 @@
+// Node_modules & In-built Functions
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
-const nodemailer = require("nodemailer");
-const connection = require("../Model/db_Mysql.js"); // Your MySQL connection
 const { promisify } = require("util");
-const { sendMailforResetPassword } = require("../MailSender/mailSender.js");
 
+// Mail Sender
+const { sendMailforResetPassword } = require("../MailSender/mailSender.js"); // Mail Sender
+
+// model
+const userModel = require("../Model/User_model.js");
+const connection = require("../Model/db_Mysql.js");
+
+// const requestPasswordReset = async (req, res) => {
+//   try {
+//     const { email } = req.body;
+
+//     // Check if admin exists using userModel
+//     const admin = await userModel.findByEmail(email);
+
+//     if (!admin) {
+//       return res
+//         .status(404)
+//         .json({ error: "Admin with this email does not exist." });
+//     }
+
+//     // Generate reset token
+//     const token = crypto.randomBytes(32).toString("hex");
+//     const expires = new Date(Date.now() + 3600000); // Token valid for 1 hour
+//     await Promise.all([
+//       // Save token and expiration in the database
+//       userModel.updateResetToken(email, token, expires),
+//       // Send reset email (Uncomment in production)
+//       sendMailforResetPassword(token),
+//       // await logModel.passwordResetlog(email, token, expires)
+//       // console.log(sender);
+//       connection.query(
+//         "INSERT INTO password_log_history (email, token, expires) VALUES (?, ?, ?)",
+//         [email, token, expires]
+//       ),
+//     ]);
+//     return res
+//       .status(200)
+//       .json({ message: "Password reset initialized and email sent." });
+//   } catch (err) {
+//     console.error("Error during password reset request:", err);
+//     return res.status(500).json({ error: "Internal server error." });
+//   }
+// };
 const requestPasswordReset = async (req, res) => {
-  const { email } = req.body;
+  try {
+    const { email } = req.body;
 
-  // Check if admin exists
-  const [admin] = await promisify(connection.query).bind(connection)(
-    "SELECT * FROM users WHERE email = ?",
-    [email]
-  );
+    // Check if admin exists using userModel
+    const admin = await userModel.findByEmail(email);
 
-  if (!admin) {
-    return res.status(404).send("Admin with this email does not exist.");
+    if (!admin) {
+      return res
+        .status(404)
+        .json({ error: "Admin with this email does not exist." });
+    }
+
+    // Generate reset token
+    const token = crypto.randomBytes(32).toString("hex");
+    const expires = new Date(Date.now() + 3600000); // Token valid for 1 hour
+
+    // Run database update and send email in parallel using Promise.all
+    await Promise.all([
+      userModel.updateResetToken(email, token, expires),
+      // Send reset email asynchronously
+      sendMailforResetPassword(token),
+      // Log password reset asynchronously
+      connection.promise().query(
+        'INSERT INTO password_reset_history (email, token, expired_at) VALUES (?, ?, ?)',
+        [email, token, expires]
+      ),
+    ]);
+
+    return res
+      .status(200)
+      .json({ message: "Password reset initialized and email sent." });
+  } catch (err) {
+    console.error("Error during password reset request:", err);
+    return res.status(500).json({ error: "Internal server error." });
   }
-
-  // Generate reset token
-  const token = crypto.randomBytes(32).toString("hex");
-  const expires = new Date(Date.now() + 3600000); // Token valid for 1 hour
-
-  // Save token and expiration in the database
-  await promisify(connection.query).bind(connection)(
-    "UPDATE users SET reset_password_token = ?, reset_password_expires = ? WHERE email = ?",
-    [token, expires, email]
-  );
-
-  // Send reset email
-  sendMailforResetPassword(token)
-    .then(() => {
-      res
-        .status(200)
-        .json({ message: "Password Reset initalized and email sent" });
-    })
-    .catch((err) => {
-      console.error("Error sending rset password request email:", err);
-      res
-        .status(500)
-        .json({
-          error: "password Reset request initalized but failed to send email",
-        });
-    });
 };
 
 const resetPassword = async (req, res) => {
-  const { token } = req.params;
-  const { newPassword } = req.body;
+  try {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+    console.log(req.params);
+    console.log(req.body);
+    // Find the user by the reset token and check if token has expired
+    const user = await userModel.findByResetToken(token);
 
-  // Find the user by the reset token and check if token has expired
-  const [user] = await promisify(db.query).bind(db)(
-    "SELECT * FROM users WHERE reset_password_token = ? AND reset_password_expires > ?",
-    [token, new Date()]
-  );
+    if (!user) {
+      return res
+        .status(400)
+        .json({ error: "Password reset token is invalid or has expired." });
+    }
 
-  if (!user) {
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password and clear the reset token and expiration
+    await userModel.updatePassword(user.email, hashedPassword, newPassword);
+
     return res
-      .status(400)
-      .send("Password reset token is invalid or has expired.");
+      .status(200)
+      .json({ message: "Password has been successfully reset." });
+  } catch (err) {
+    console.error("Error during password reset:", err);
+    return res.status(500).json({ error: "Internal server error." });
   }
-
-  // Hash the new password
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-  // Update the user's password and clear the reset token and expiration
-  await promisify(db.query).bind(db)(
-    "UPDATE users SET encrypted_password = ?, password = ?, reset_password_token = NULL, reset_password_expires = NULL WHERE email = ?",
-    [hashedPassword, newPassword, user.email]
-  );
-
-  res.send("Password has been successfully reset.");
 };
 
 module.exports = { requestPasswordReset, resetPassword };

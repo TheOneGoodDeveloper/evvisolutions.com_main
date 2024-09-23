@@ -8,7 +8,7 @@ const createComment = async (req, res) => {
     return res.status(400).json({ message: "Comment cannot be empty" });
   }
 
-  await commentModel.createComment({ blog_id, user_id, comment }, (err) => {
+  await commentModel.createComment({ blog_id,  comment }, (err) => {
     if (err) {
       return res.status(500).json({ message: "Failed to create comment" });
     }

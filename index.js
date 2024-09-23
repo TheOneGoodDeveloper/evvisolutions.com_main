@@ -15,7 +15,8 @@ const app = express();
 const port = 3000;
 
 app.use(express.json({ limit: "10mb" }));
-app.use(cors({ origin: "http://localhost:5173" }));
+// app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors());
 
 app.use("/blog_images", express.static(path.join(__dirname, "/blog_images")));
 
