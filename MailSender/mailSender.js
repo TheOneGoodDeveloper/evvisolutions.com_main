@@ -140,7 +140,7 @@ const sendMailforResetPassword = async (resetToken) => {
                 </p>
                 <div style="text-align: center; margin: 20px 0">
                   <a
-                    href="http://localhost:3000/reset-password?token=${resetToken}"
+                    href="http://localhost:5173/resetPassword?token=${resetToken}"
                     style="
                       background-color: #4caf50;
                       color: #ffffff;
