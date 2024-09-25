@@ -12,8 +12,32 @@ class commentModel {
   }
 
   static getCommentByBlogId(blogId, callback) {
-    const query =
-      "SELECT * FROM comments WHERE blog_id = ? ORDER BY created_at DESC";
+    const query = `SELECT 
+    comments.id AS comment_id,
+    comments.comment AS comment,
+    comments.username AS comment_username,
+    comments.created_at AS comment_created_at,
+    (
+        SELECT 
+            GROUP_CONCAT(
+                CONCAT_WS(': ', 
+                    replies.id, 
+                    replies.reply, 
+                    replies.username,
+                    replies.created_at  
+                ) 
+                ORDER BY replies.created_at
+            ) 
+        FROM 
+            replies 
+        WHERE 
+            replies.comment_id = comments.id
+    ) AS replies
+FROM 
+    comments
+WHERE 
+    comments.blog_id = ?;
+`;
     connection.query(query, [blogId], callback);
   }
   static async getAllComments(callback) {
@@ -27,9 +51,9 @@ class commentModel {
     }
   }
 
-  static async deleteComment({ commentId, blog_id }){
+  static async deleteComment({ commentId, blog_id }) {
     return new Promise((resolve, reject) => {
-      const query = 'DELETE FROM comments WHERE id = ? AND blog_id = ?';
+      const query = "DELETE FROM comments WHERE id = ? AND blog_id = ?";
       connection.query(query, [commentId, blog_id], (err, result) => {
         if (err) {
           return reject(err);

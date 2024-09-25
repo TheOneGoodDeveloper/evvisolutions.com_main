@@ -34,5 +34,6 @@ UserRoute.post("/createComments", createComment);
 UserRoute.get("/getCommentByBlogId/:id", getCommentByBlogId);
 UserRoute.post("/auth/requestPasswordReset", requestPasswordReset);
 UserRoute.post("/auth/resetPassword/:token", resetPassword);
+UserRoute.post("/replyToComment",createReply)
 UserRoute.post ("/getReplies",getReplies);
 module.exports = UserRoute;

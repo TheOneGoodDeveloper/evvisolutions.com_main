@@ -20,14 +20,39 @@ const createComment = async (req, res) => {
 // Get comments for a blog
 const getCommentByBlogId = async (req, res) => {
   const blogId = req.params.id;
-  await commentModel.getCommentByBlogId(blogId, (err, comments) => {
-    if (err) {
-      return res
-        .status(500)
-        .json({ status: true, message: "Error fetching comments" });
+  const result = await commentModel.getCommentByBlogId(
+    blogId,
+    (err, comments) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ status: true, message: "Error fetching comments" });
+      }
+      // Function to convert replies string to an array of objects
+      const convertRepliesStringToArray = (repliesString) => {
+        return repliesString && repliesString.trim() !== ""
+          ? repliesString.split(",").map((replys) => {
+              const [reply_id, reply, reply_username, reply_created_at] = replys
+                .split(":")
+                .map((item) => item.trim());
+              return {
+                reply_id: Number(reply_id), // Convert reply_id to a number
+                reply: reply,
+                reply_username: reply_username,
+                reply_created_at: reply_created_at,
+              };
+            })
+          : []; // Return an empty array if repliesString is null or empty
+      };
+
+      // Iterate through each comment and convert replies dynamically
+      comments.forEach((comment) => {
+        comment.replies = convertRepliesStringToArray(comment.replies);
+      });
+
+      res.status(200).json({ message: "Get all Comments", comments });
     }
-    res.status(200).json({ message: "Get all Comments", comments });
-  });
+  );
 };
 
 // Delete a comment
@@ -73,8 +98,6 @@ const getAllComments = async (req, res) => {
     });
   }
 };
-
-
 
 module.exports = {
   createComment,

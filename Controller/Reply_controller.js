@@ -2,7 +2,7 @@ const replyModel = require("../Model/Reply_model");
 
 const createReply = async (req, res) => {
   const { comment_id, reply } = req.body;
-  const username = req.body.username ? req.body.username : "admin";
+  const username = req.body.username ? req.body.username : "author";
 
   // Validate input
   if (!comment_id || !reply) {
@@ -23,15 +23,15 @@ const createReply = async (req, res) => {
 };
 
 const getReplies = async (req, res) => {
-  const { commentId } = req.params;
+  const { comment_id } = req.body;
 
   // Validate input
-  if (!commentId) {
+  if (!comment_id) {
     return res.status(400).json({ message: "commentId is required." });
   }
 
   try {
-    const replies = await replyModel.getRepliesByCommentId(commentId);
+    const replies = await replyModel.getRepliesByCommentId(comment_id);
     res.status(200).json(replies);
   } catch (error) {
     console.error("Error fetching replies:", error);
