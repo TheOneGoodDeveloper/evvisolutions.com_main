@@ -24,7 +24,7 @@ const createComment = async (req, res) => {
 // Get comments for a blog
 const getCommentByBlogId = async (req, res) => {
   const blogId = req.params.id;
-  const result = await commentModel.getCommentByBlogId(
+   await commentModel.getCommentByBlogId(
     blogId,
     (err, comments) => {
       if (err) {
@@ -62,7 +62,7 @@ const getCommentByBlogId = async (req, res) => {
 
 // Delete a comment
 const deleteComment = async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const { commentId, blog_id } = req.body;
 
   try {
