@@ -14,7 +14,9 @@ const {
   createComment,
   deleteComment,
   getCommentByBlogId,
-  getAllComments
+  getAllComments,
+  hideComment,
+  unhideComment
 } = require("../Controller/Comment_controller.js");
 const {
   createBlog,
@@ -30,7 +32,7 @@ const {
   getContacts,
   deleteContact,
 } = require("../Controller/Contact_controller.js");
-const {createReply,getReplies} = require("../Controller/Reply_controller.js")
+const {createReply,getReplies,hideReply,unhideReply} = require("../Controller/Reply_controller.js");
 // user Api's
 AdminRoute.post("/login", adminLogin);
 AdminRoute.post(
@@ -56,4 +58,9 @@ AdminRoute.post("/getleads",authMiddleware,getContacts)
 AdminRoute.post("/getAllComments",authMiddleware,getAllComments);
 AdminRoute.post("/deleteComment",authMiddleware,deleteComment)
 AdminRoute.post("/replyToComment",authMiddleware,createReply)
+AdminRoute.post("/getAllReplies",authMiddleware,getReplies)
+AdminRoute.get("/hideReply",authMiddleware,hideReply)
+AdminRoute.get("/unhideReply",authMiddleware,unhideReply)
+AdminRoute.post("/hideComment",authMiddleware,hideComment)
+AdminRoute.get("/unhideComment",authMiddleware,unhideComment)
 module.exports = AdminRoute;
