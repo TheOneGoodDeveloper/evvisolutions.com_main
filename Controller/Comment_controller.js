@@ -24,45 +24,42 @@ const createComment = async (req, res) => {
 // Get comments for a blog
 const getCommentByBlogId = async (req, res) => {
   const blogId = req.params.id;
-   await commentModel.getCommentByBlogId(
-    blogId,
-    (err, comments) => {
-      if (err) {
-        console.log(err);
-        return res
-          .status(500)
-          .json({ status: false, message: "Error fetching comments" });
-      }
-      // Function to convert replies string to an array of objects
-      const convertRepliesStringToArray = (repliesString) => {
-        return repliesString && repliesString.trim() !== ""
-          ? repliesString.split(",").map((replys) => {
-              const [reply_id, reply, reply_username, reply_created_at] = replys
-                .split("|")
-                .map((item) => item.trim());
-              return {
-                reply_id: Number(reply_id), // Convert reply_id to a number
-                reply: reply,
-                reply_username: reply_username,
-                reply_created_at: reply_created_at,
-              };
-            })
-          : []; // Return an empty array if repliesString is null or empty
-      };
-
-      // Iterate through each comment and convert replies dynamically
-      comments.forEach((comment) => {
-        comment.replies = convertRepliesStringToArray(comment.replies);
-      });
-
-      res.status(200).json({ message: "Get all Comments", comments });
+  await commentModel.getCommentByBlogId(blogId, (err, comments) => {
+    if (err) {
+      console.log(err);
+      return res
+        .status(500)
+        .json({ status: false, message: "Error fetching comments" });
     }
-  );
+    // Function to convert replies string to an array of objects
+    const convertRepliesStringToArray = (repliesString) => {
+      return repliesString && repliesString.trim() !== ""
+        ? repliesString.split(",").map((replys) => {
+            const [reply_id, reply, reply_username, reply_created_at] = replys
+              .split("|")
+              .map((item) => item.trim());
+            return {
+              reply_id: Number(reply_id), // Convert reply_id to a number
+              reply: reply,
+              reply_username: reply_username,
+              reply_created_at: reply_created_at,
+            };
+          })
+        : []; // Return an empty array if repliesString is null or empty
+    };
+
+    // Iterate through each comment and convert replies dynamically
+    comments.forEach((comment) => {
+      comment.replies = convertRepliesStringToArray(comment.replies);
+    });
+
+    res.status(200).json({ message: "Get all Comments", comments });
+  });
 };
 
 // Delete a comment
 const deleteComment = async (req, res) => {
-  // console.log(req.body);
+  console.log(req.body);
   const { commentId, blog_id } = req.body;
 
   try {
@@ -86,8 +83,9 @@ const deleteComment = async (req, res) => {
 };
 
 const getAllComments = async (req, res) => {
+  const { role } = req.user;
   try {
-    await commentModel.getAllComments((err, comments) => {
+    await commentModel.getAllComments(role, (err, comments) => {
       if (err) {
         console.error("Error fetching comments:", err);
         return res
@@ -97,18 +95,20 @@ const getAllComments = async (req, res) => {
       const convertRepliesStringToArray = (repliesString) => {
         return repliesString && repliesString.trim() !== ""
           ? repliesString.split(",").map((replys) => {
-              const [reply_id, reply, reply_username, reply_created_at, reply_is_hidden] = replys
-                .split("|")
-                .map((item) => item.trim());
-                console.log(reply_is_hidden);
+              const [
+                reply_id,
+                reply,
+                reply_username,
+                reply_created_at,
+                reply_is_hidden,
+              ] = replys.split("|").map((item) => item.trim());
               return {
                 reply_id: Number(reply_id), // Convert reply_id to a number
                 reply: reply,
                 reply_username: reply_username,
                 reply_created_at: reply_created_at,
-                reply_is_hidden: reply_is_hidden
+                reply_is_hidden: reply_is_hidden,
               };
-                
             })
           : []; // Return an empty array if repliesString is null or empty
       };
@@ -131,8 +131,9 @@ const getAllComments = async (req, res) => {
 };
 
 const hideComment = async (req, res) => {
-  const { comment_id } = req.body;
+  const { comment_id, Is_hidden } = req.body;
   console.log(req.body);
+
   // Validate input
   if (!comment_id) {
     return res
@@ -141,7 +142,7 @@ const hideComment = async (req, res) => {
   }
 
   try {
-    const [result] = await commentModel.hideComment(comment_id);
+    const result = await commentModel.hideComment(comment_id, Is_hidden);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({
@@ -150,7 +151,9 @@ const hideComment = async (req, res) => {
       });
     }
 
-    res.status(200).json({ status: true, message: "hidden" });
+    res
+      .status(200)
+      .json({ status: true, message: "Comment hidden successfully." });
   } catch (error) {
     console.error("Error hiding comment:", error);
     res
@@ -158,8 +161,10 @@ const hideComment = async (req, res) => {
       .json({ status: false, message: "Error hiding comment", error });
   }
 };
+
 const unhideComment = async (req, res) => {
-  const { comment_id } = req.body;
+  const { comment_id, Is_hidden } = req.body; // Use consistent casing for is_hidden
+  // console.log(req.body);
 
   // Validate input
   if (!comment_id) {
@@ -169,8 +174,10 @@ const unhideComment = async (req, res) => {
   }
 
   try {
-    const [result] = await commentModel.unhideComment(comment_id);
+    // Assuming unhideComment returns an object, not an array
+    const result = await commentModel.unhideComment(comment_id, Is_hidden);
 
+    // Check if the result has 'affectedRows' property
     if (result.affectedRows === 0) {
       return res.status(404).json({
         status: false,

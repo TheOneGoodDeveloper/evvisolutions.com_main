@@ -86,7 +86,7 @@ const adminLogin = async (req, res) => {
           token,
           user: {
             id: user.id,
-            email: user.email,  
+            email: user.email,
             role: user.role,
           },
         });
@@ -98,7 +98,5 @@ const adminLogin = async (req, res) => {
       .json({ status: false, message: "Internal server error", error });
   }
 };
-
-
 
 module.exports = { authMiddleware, adminLogin };

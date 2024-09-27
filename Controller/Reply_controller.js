@@ -4,7 +4,7 @@ const createReply = async (req, res) => {
   const { id, reply } = req.body;
   const username = req.body.username ? req.body.username : "author";
   console.log(req.body);
-  
+
   // Validate input
   if (!id || !reply) {
     return res.status(400).json({

@@ -111,4 +111,4 @@ const deleteContact = async (req, res) => {
     return res.status(200).json({ message: "Contact deleted successfully" });
   });
 };
-module.exports = { contactSubmit,updateContact,getContacts,deleteContact };
+module.exports = { contactSubmit, updateContact, getContacts, deleteContact };

@@ -12,7 +12,6 @@ class commentModel {
   }
 
   static getCommentByBlogId(blogId, callback) {
-    
     const query = `
     SELECT comments.id AS comment_id,
     comments.comment AS comment,
@@ -43,72 +42,123 @@ WHERE
 `;
     connection.query(query, [blogId], callback);
   }
-  static getCommentByBlogIdforAdmin(blogId, callback) {
-    const query = `SELECT 
-    comments.id AS comment_id,
-    comments.comment AS comment,
-    comments.username AS comment_username,
-    comments.created_at AS comment_created_at,
-    (
+  //   static getCommentByBlogIdforAdmin(blogId, callback) {
+  //     const query = `SELECT
+  //     comments.id AS comment_id,
+  //     comments.comment AS comment,
+  //     comments.username AS comment_username,
+  //     comments.created_at AS comment_created_at,
+  //     (
+  //         SELECT
+  //             GROUP_CONCAT(
+  //                 CONCAT_WS(': ',
+  //                     replies.id,
+  //                     replies.reply,
+  //                     replies.username,
+  //                     replies.created_at
+  //                 )
+  //                 ORDER BY replies.created_at
+  //             )
+  //         FROM
+  //             replies
+  //         WHERE
+  //             replies.comment_id = comments.id
+  //     ) AS replies
+  // FROM
+  //     comments
+  // WHERE
+  //     comments.blog_id = ?;
+  // `;
+  //     connection.query(query, [blogId], callback);
+  //   }
+  // static async getAllComments(callback) {
+  //   try {
+  //             const query = `SELECT
+  //           comments.id AS comment_id,
+  //           comments.comment AS comment,
+  //           comments.username AS comment_username,
+  //           comments.created_at AS comment_created_at,
+  //           comments.is_hidden AS comment_is_hidden,
+  //           blogs.blog_title AS blog_title,
+  //           blogs.blog_author AS blog_author,
+  //           (
+  //               SELECT
+  //                   GROUP_CONCAT(
+  //                       CONCAT_WS('| ',
+  //                           replies.id,
+  //                           replies.reply,
+  //                           replies.username,
+  //                           replies.created_at,
+  //                           replies.is_hidden
+  //                       )
+  //                       ORDER BY replies.created_at
+  //                   )
+  //               FROM
+  //                   replies
+  //               WHERE
+  //                   replies.comment_id = comments.id
+  //                   AND replies.is_hidden = FALSE
+  //           ) AS replies
+  //       FROM
+  //           comments
+  //       JOIN
+  //           blogs
+  //       ON
+  //           comments.blog_id = blogs.id
+  //       ORDER BY
+  //           comments.id ASC`;
+  //     connection.query(query, callback);
+  //   } catch (error) {
+  //     console.error("Error fetching comments:", error);
+  //     callback(error, null);
+  //   }
+  // }
+  static async getAllComments(role, callback) {
+    try {
+      // Adjust the query based on the user's role (admin or user)
+      const query = `
         SELECT 
-            GROUP_CONCAT(
-                CONCAT_WS(': ', 
-                    replies.id, 
-                    replies.reply, 
-                    replies.username,
-                    replies.created_at  
+          comments.id AS comment_id,
+          comments.comment AS comment,
+          comments.username AS comment_username,
+          comments.created_at AS comment_created_at,
+          comments.is_hidden AS comment_is_hidden,
+          blogs.id AS blog_id,
+          blogs.blog_title AS blog_title, 
+          blogs.blog_author AS blog_author,
+          (
+            SELECT 
+              GROUP_CONCAT(
+                CONCAT_WS('| ', 
+                  replies.id, 
+                  replies.reply, 
+                  replies.username,
+                  replies.created_at,  
+                  replies.is_hidden
                 ) 
                 ORDER BY replies.created_at
-            ) 
+              ) 
+            FROM 
+              replies 
+            WHERE 
+              replies.comment_id = comments.id
+              ${
+                role !== "admin" ? "AND replies.is_hidden = FALSE" : ""
+              } -- Only show visible replies for non-admin
+          ) AS replies
         FROM 
-            replies 
-        WHERE 
-            replies.comment_id = comments.id
-    ) AS replies
-FROM 
-    comments
-WHERE 
-    comments.blog_id = ?;
-`;
-    connection.query(query, [blogId], callback);
-  }
-  static async getAllComments(callback) {
-    try {
-              const query = `SELECT 
-            comments.id AS comment_id,
-            comments.comment AS comment,
-            comments.username AS comment_username,
-            comments.created_at AS comment_created_at,
-            blogs.blog_title AS blog_title, 
-            blogs.blog_author AS blog_author,
-            (
-                SELECT 
-                    GROUP_CONCAT(
-                        CONCAT_WS('| ', 
-                            replies.id, 
-                            replies.reply, 
-                            replies.username,
-                            replies.created_at,  
-                            replies.is_hidden
-                        ) 
-                        ORDER BY replies.created_at
-                    ) 
-                FROM 
-                    replies 
-                WHERE 
-                    replies.comment_id = comments.id
-                    AND replies.is_hidden = FALSE
-            ) AS replies
-        FROM 
-            comments
+          comments
         JOIN 
-            blogs 
+          blogs 
         ON 
-            comments.blog_id = blogs.id 
-        WHERE 
-            comments.is_hidden = FALSE 
+          comments.blog_id = blogs.id 
+        ${
+          role !== "admin" ? "WHERE comments.is_hidden = FALSE" : ""
+        } -- Only show visible comments for non-admin
         ORDER BY 
-            comments.id ASC`;
+          comments.id ASC`;
+
+      // Execute the query
       connection.query(query, callback);
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -127,7 +177,7 @@ WHERE
       });
     });
   }
-  static async unhideComment(comment_id) {
+  static async unhideComment(comment_id, hidden_status) {
     return new Promise((resolve, reject) => {
       const checkQuery = `SELECT is_hidden FROM comments WHERE id = ?`;
       connection.query(checkQuery, [comment_id], (err, result) => {
@@ -142,15 +192,19 @@ WHERE
           return reject(new Error("Comment is already visible"));
         }
 
-        const updateQuery = `UPDATE comments SET is_hidden = FALSE WHERE id = ?`;
-        connection.query(updateQuery, [comment_id], (err, result) => {
-          if (err) return reject(err);
-          resolve(result);
-        });
+        const updateQuery = `UPDATE comments SET is_hidden = ? WHERE id = ?`;
+        connection.query(
+          updateQuery,
+          [hidden_status, comment_id],
+          (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+          }
+        );
       });
     });
   }
-  static async hideComment(comment_id) {
+  static async hideComment(comment_id, hidden_status) {
     return new Promise((resolve, reject) => {
       const checkQuery = `SELECT is_hidden FROM comments WHERE id = ?`;
       connection.query(checkQuery, [comment_id], (err, result) => {
@@ -165,11 +219,15 @@ WHERE
           return reject(new Error("Comment is already hidden"));
         }
 
-        const updateQuery = `UPDATE comments SET is_hidden = TRUE WHERE id = ?`;
-        connection.query(updateQuery, [comment_id], (err, result) => {
-          if (err) return reject(err);
-          resolve(result);
-        });
+        const updateQuery = `UPDATE comments SET is_hidden = ? WHERE id = ?`;
+        connection.query(
+          updateQuery,
+          [hidden_status, comment_id],
+          (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+          }
+        );
       });
     });
   }

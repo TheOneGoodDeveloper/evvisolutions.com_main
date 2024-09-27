@@ -69,10 +69,12 @@ const requestPasswordReset = async (req, res) => {
       // Send reset email asynchronously
       sendMailforResetPassword(token),
       // Log password reset asynchronously
-      connection.promise().query(
-        'INSERT INTO password_reset_history (email, token, expired_at) VALUES (?, ?, ?)',
-        [email, token, expires]
-      ),
+      connection
+        .promise()
+        .query(
+          "INSERT INTO password_reset_history (email, token, expired_at) VALUES (?, ?, ?)",
+          [email, token, expires]
+        ),
     ]);
 
     return res

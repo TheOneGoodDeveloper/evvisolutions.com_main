@@ -62,5 +62,5 @@ AdminRoute.post("/getAllReplies",authMiddleware,getReplies)
 AdminRoute.get("/hideReply",authMiddleware,hideReply)
 AdminRoute.get("/unhideReply",authMiddleware,unhideReply)
 AdminRoute.post("/hideComment",authMiddleware,hideComment)
-AdminRoute.get("/unhideComment",authMiddleware,unhideComment)
+AdminRoute.post("/unhideComment",authMiddleware,unhideComment)
 module.exports = AdminRoute;
