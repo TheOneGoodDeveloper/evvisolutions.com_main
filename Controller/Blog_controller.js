@@ -78,13 +78,13 @@ const updateBlog = async (req, res) => {
     // console.log(blog);
     // Delete the old image if a new image is uploaded
     if (req.file && blog[0].blog_image) {
-      console.log("image");
+      // console.log("image");
       const oldImagePath = path.join(
         __dirname,
         "../blog_images/",
         blog[0].blog_image
       );
-      console.log(oldImagePath);
+      // console.log(oldImagePath);
       deleteOldImage(oldImagePath);
     }
 

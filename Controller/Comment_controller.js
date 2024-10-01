@@ -3,7 +3,7 @@ const commentModel = require("../Model/Comment_model.js");
 // Create a comment
 const createComment = async (req, res) => {
   const { blog_id, username, comment } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
 
   if (!comment) {
     return res
@@ -58,7 +58,7 @@ const getCommentByBlogId = async (req, res) => {
 
 // Delete a comment
 const deleteComment = async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const { commentId, blog_id } = req.body;
 
   try {
@@ -131,7 +131,7 @@ const getAllComments = async (req, res) => {
 
 const hideComment = async (req, res) => {
   const { comment_id, Is_hidden } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
 
   // Validate input
   if (!comment_id) {

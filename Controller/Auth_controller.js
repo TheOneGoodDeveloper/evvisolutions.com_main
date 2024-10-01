@@ -31,7 +31,7 @@ const requestPasswordReset = async (req, res) => {
     await Promise.all([
       userModel.updateResetToken(email, token, expires),
       // Send reset email asynchronously
-      sendMailforResetPassword(token),
+      sendMailforResetPassword(email,token),
       // Log password reset asynchronously
       connection
         .promise()
@@ -54,8 +54,8 @@ const resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
     const { newPassword } = req.body;
-    console.log(req.params);
-    console.log(req.body);
+    // console.log(req.params);
+    // console.log(req.body);
     // Find the user by the reset token and check if token has expired
     const user = await userModel.findByResetToken(token);
 

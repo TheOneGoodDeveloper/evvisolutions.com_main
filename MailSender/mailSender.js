@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 
 const SendEmail = (result) => {
   return new Promise((resolve, reject) => {
-    console.log(result);
+    // console.log(result);
     const mailOptions = {
       to: process.env["EMAIL_TO"],
       from: result.email,
@@ -88,7 +88,7 @@ const SendEmail = (result) => {
   });
 };
 
-const sendMailforResetPassword = async (resetToken) => {
+const sendMailforResetPassword = async (email,resetToken) => {
   // console.log(resetToken);
   return new Promise(async (resolve, reject) => {
     try {
@@ -141,7 +141,7 @@ const sendMailforResetPassword = async (resetToken) => {
                 </p>
                 <div style="text-align: center; margin: 20px 0">
                   <a
-                    href="http://localhost:5173/resetPassword?token=${resetToken}"
+                    href="https://www.evvisolutions.com//resetPassword?token=${resetToken}"
                     style="
                       background-color: #4caf50;
                       color: #ffffff;
@@ -221,7 +221,7 @@ const sendMailforResetPassword = async (resetToken) => {
       // Send email
       let info = await transporter.sendMail({
         from: "info@evvisolutions.com", // sender address
-        to:  "sarasuhusband2@gmail.com", // recipient address
+        to:  email, // recipient address
         subject: "Reset Your Password-Regards", // Subject line
         html: mailContent, // email body (HTML)
       });

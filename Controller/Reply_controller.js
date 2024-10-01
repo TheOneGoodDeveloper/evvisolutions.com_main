@@ -3,7 +3,7 @@ const replyModel = require("../Model/Reply_model");
 const createReply = async (req, res) => {
   const { id, reply } = req.body;
   const username = req.body.username ? req.body.username : "author";
-  console.log(req.body);
+  // console.log(req.body);
 
   // Validate input
   if (!id || !reply) {
@@ -42,7 +42,7 @@ const getReplies = async (req, res) => {
 
 const hideReply = async (req, res) => {
   const { reply_id, hide_status } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
 
   // Validate input
   if (!reply_id) {
@@ -86,7 +86,7 @@ const hideReply = async (req, res) => {
 const unhideReply = async (req, res) => {
   const { reply_id, hide_status } = req.body; // Removed hide_status since it's not needed for unhiding
 
-  console.log("Received reply_id:", reply_id, hide_status);
+  // console.log("Received reply_id:", reply_id, hide_status);
 
   // Validate input
   if (!reply_id || typeof reply_id !== "number") {

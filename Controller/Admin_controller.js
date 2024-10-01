@@ -37,7 +37,7 @@ const authMiddleware = (req, res, next) => {
 const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log("Login successfull");
+    // console.log("Login successfull");
     // Check if the user exists
     connection.query(
       "SELECT * FROM users WHERE email = ?",
