@@ -10,42 +10,6 @@ const { sendMailforResetPassword } = require("../MailSender/mailSender.js"); // 
 const userModel = require("../Model/User_model.js");
 const connection = require("../Model/db_Mysql.js");
 
-// const requestPasswordReset = async (req, res) => {
-//   try {
-//     const { email } = req.body;
-
-//     // Check if admin exists using userModel
-//     const admin = await userModel.findByEmail(email);
-
-//     if (!admin) {
-//       return res
-//         .status(404)
-//         .json({ error: "Admin with this email does not exist." });
-//     }
-
-//     // Generate reset token
-//     const token = crypto.randomBytes(32).toString("hex");
-//     const expires = new Date(Date.now() + 3600000); // Token valid for 1 hour
-//     await Promise.all([
-//       // Save token and expiration in the database
-//       userModel.updateResetToken(email, token, expires),
-//       // Send reset email (Uncomment in production)
-//       sendMailforResetPassword(token),
-//       // await logModel.passwordResetlog(email, token, expires)
-//       // console.log(sender);
-//       connection.query(
-//         "INSERT INTO password_log_history (email, token, expires) VALUES (?, ?, ?)",
-//         [email, token, expires]
-//       ),
-//     ]);
-//     return res
-//       .status(200)
-//       .json({ message: "Password reset initialized and email sent." });
-//   } catch (err) {
-//     console.error("Error during password reset request:", err);
-//     return res.status(500).json({ error: "Internal server error." });
-//   }
-// };
 const requestPasswordReset = async (req, res) => {
   try {
     const { email } = req.body;

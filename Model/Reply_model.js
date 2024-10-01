@@ -1,5 +1,4 @@
 const connection = require("./db_Mysql.js");
-
 class replyModel {
   static async getRepliesByCommentId(commentId) {
     return new Promise((resolve, reject) => {
@@ -8,7 +7,7 @@ class replyModel {
         [commentId],
         (error, results) => {
           if (error) {
-            console.log(err);
+            console.log(error); // Corrected the variable name to error
             return reject(error);
           }
           resolve(results);
@@ -31,18 +30,41 @@ class replyModel {
       );
     });
   }
-  static async hideReply(reply_id) {
-    const query = `UPDATE replies SET is_hidden = TRUE WHERE id = ?`;
 
-    // Execute the query and return the result
-    return connection.execute(query, [reply_id]);
+  static async hideReply(reply_id, hide_status) {
+    return new Promise((resolve, reject) => {
+      const query = `UPDATE replies SET is_hidden = ? WHERE id = ?`;
+      connection.query(query, [hide_status, reply_id], (error, results) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve(results);
+      });
+    });
   }
 
-  static async unhideReply(reply_id) {
-    const query = `UPDATE replies SET is_hidden =FALSE  WHERE id = ?`;
+  static async unhideReply(reply_id, hide_status) {
+    return new Promise((resolve, reject) => {
+      const query = `UPDATE replies SET is_hidden = ? WHERE id = ?`;
+      connection.query(query, [hide_status, reply_id], (error, results) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve(results);
+      });
+    });
+  }
 
-    // Execute the query and return the result
-    return connection.execute(query, [reply_id]);
+  static async getReplyById (reply_id) {
+    return new Promise((resolve, reject) => {
+      const query = 'SELECT * FROM replies WHERE id = ?';
+      connection.query(query, [reply_id], (error, results) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve(results[0]); // Returning the first result if reply found
+      });
+    });
   }
 }
 

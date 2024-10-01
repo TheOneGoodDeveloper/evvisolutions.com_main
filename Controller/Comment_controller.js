@@ -17,7 +17,7 @@ const createComment = async (req, res) => {
         .status(500)
         .json({ status: false, message: "Failed to create comment" });
     }
-    res.status(200).json({ status: true, message: "Thanks For Commenting" }); // Redirect to the blog page
+    return res.status(200).json({ status: true, message: "Thanks For Commenting" }); 
   });
 };
 
@@ -45,15 +45,14 @@ const getCommentByBlogId = async (req, res) => {
               reply_created_at: reply_created_at,
             };
           })
-        : []; // Return an empty array if repliesString is null or empty
+        : [];
     };
 
-    // Iterate through each comment and convert replies dynamically
     comments.forEach((comment) => {
       comment.replies = convertRepliesStringToArray(comment.replies);
     });
 
-    res.status(200).json({ message: "Get all Comments", comments });
+    return res.status(200).json({ message: "Get all Comments", comments });
   });
 };
 
@@ -76,7 +75,7 @@ const deleteComment = async (req, res) => {
     res.status(200).json({ message: "Comment deleted successfully" });
   } catch (err) {
     console.error(err);
-    res
+    return res
       .status(500)
       .json({ status: false, message: "Failed to delete comment" });
   }
@@ -151,14 +150,14 @@ const hideComment = async (req, res) => {
       });
     }
 
-    res
+   return res
       .status(200)
       .json({ status: true, message: "Comment hidden successfully." });
   } catch (error) {
     console.error("Error hiding comment:", error);
-    res
+    return res
       .status(500)
-      .json({ status: false, message: "Error hiding comment", error });
+      .json({ status: false, message: "Comment is already hidden" });
   }
 };
 
@@ -188,9 +187,9 @@ const unhideComment = async (req, res) => {
     res.status(200).json({ message: "Comment unhidden successfully!" });
   } catch (error) {
     console.error("Error unhiding comment:", error);
-    res
+    return res
       .status(500)
-      .json({ status: false, message: "Error unhiding comment", error });
+      .json({ status: false, message: "Error unhiding comment" });
   }
 };
 

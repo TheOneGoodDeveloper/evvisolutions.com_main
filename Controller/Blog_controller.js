@@ -68,7 +68,7 @@ const getBlogById = async (req, res) => {
 const updateBlog = async (req, res) => {
   try {
     const { id, title, body, author } = req.body;
-    const newImage = req.file ? req.file.filename : null;
+    const newImage = req.file ? req.file.filename :req.body.image ;
     // Fetch the old blog to get the current image
     const blog = await BlogModel.getBlogById(id);
     if (blog.length === 0) {
@@ -77,7 +77,7 @@ const updateBlog = async (req, res) => {
 
     // console.log(blog);
     // Delete the old image if a new image is uploaded
-    if (newImage && blog[0].blog_image) {
+    if (req.file && blog[0].blog_image) {
       console.log("image");
       const oldImagePath = path.join(
         __dirname,

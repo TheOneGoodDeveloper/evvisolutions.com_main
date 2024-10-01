@@ -20,7 +20,7 @@ const SendEmail = (result) => {
     const mailOptions = {
       to: process.env["EMAIL_TO"],
       from: result.email,
-      subject: `${result.subject}`,
+      subject: `Inquire - ${result.subject}`,
       // text: "hello",
       html: `<!DOCTYPE html>
 
@@ -61,7 +61,8 @@ const SendEmail = (result) => {
         <h1>${result.subject}</h1>
         <p>Dear Representative, </p>
         <p>I hope this message finds you well.</p>
-        <p>My name is ${result.name}, ${result.details}</p>
+        <p>My name is ${result.name}</p><br>
+         <p>${result.details}</p>
         <div class="contact-details">
             <p><strong>Phone:</strong> ${result.phone}</p>
             <p><strong>Email:</strong> ${result.email}</p>

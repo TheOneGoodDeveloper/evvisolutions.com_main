@@ -41,7 +41,8 @@ const getReplies = async (req, res) => {
 };
 
 const hideReply = async (req, res) => {
-  const { reply_id } = req.body;
+  const { reply_id, hide_status } = req.body;
+  console.log(req.body);
 
   // Validate input
   if (!reply_id) {
@@ -49,42 +50,93 @@ const hideReply = async (req, res) => {
   }
 
   try {
-    const [result] = await replyModel.hideReply(reply_id);
+    // Check if reply exists and its current hide status
+    const existingReply = await replyModel.getReplyById(reply_id);
+    if (!existingReply) {
+      return res.status(404).json({ message: "Reply not found." });
+    }
 
+    if (existingReply.is_hidden == hide_status) {
+      return res.status(400).json({
+        message: hide_status
+          ? "Reply is already hidden."
+          : "Reply is visible Already.",
+      });
+    }
+
+    // Update hide status
+    const result = await replyModel.hideReply(reply_id, hide_status);
     if (result.affectedRows === 0) {
       return res
         .status(404)
-        .json({ message: "Reply not found or already hidden." });
+        .json({ message: "Failed to update the reply status." });
     }
 
-    res.status(200).json({ message: "Reply hidden successfully!" });
+    return res.status(200).json({
+      message: hide_status
+        ? "Reply hidden successfully!"
+        : "Reply already visible!",
+    });
   } catch (error) {
     console.error("Error hiding reply:", error);
-    res.status(500).json({ message: "Error hiding reply", error });
+    return res.status(500).json({ message: "Error hiding reply" });
   }
 };
 
 const unhideReply = async (req, res) => {
-  const { reply_id } = req.body;
+  const { reply_id, hide_status } = req.body; // Removed hide_status since it's not needed for unhiding
+
+  console.log("Received reply_id:", reply_id, hide_status);
 
   // Validate input
-  if (!reply_id) {
-    return res.status(400).json({ message: "Reply ID is required." });
+  if (!reply_id || typeof reply_id !== "number") {
+    return res.status(400).json({
+      status: false,
+      message: "Valid reply ID is required.",
+    });
   }
 
   try {
-    const [result] = await replyModel.unhideReply(reply_id);
+    // Check if the reply exists and its current status
+    const existingReplies = await replyModel.getReplyById(reply_id);
 
-    if (result.affectedRows === 0) {
-      return res
-        .status(404)
-        .json({ message: "Reply not found or already visible." });
+    if (existingReplies.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "Reply not found.",
+      });
     }
 
-    res.status(200).json({ message: "Reply unhidden successfully!" });
+    const existingReply = existingReplies[0];
+    if (!existingReplies.is_hidden) {
+      return res.status(400).json({
+        status: false,
+        message: "Reply is already visible.",
+      });
+    }
+
+    // Unhide the reply using the model
+    const result = await replyModel.unhideReply(reply_id, hide_status);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "Failed to unhide the reply.",
+      });
+    }
+
+    // Send success response
+    return res.status(200).json({
+      status: true,
+      message: "Reply unhidden successfully!",
+    });
   } catch (error) {
     console.error("Error unhiding reply:", error);
-    res.status(500).json({ message: "Error unhiding reply", error });
+
+    // Send error response
+    return res.status(500).json({
+      status: false,
+      message: "An error occurred while un-hiding the reply.",
+    });
   }
 };
 

@@ -43,7 +43,7 @@ AdminRoute.post(
 ); // Single file upload with field name 'image'
 AdminRoute.get("/getAllBlogs", authMiddleware, getAllBlogs);
 AdminRoute.get("/:id", authMiddleware, getBlogById);
-AdminRoute.post(
+AdminRoute.put(
   "/updateBlog",
   authMiddleware,
   upload.single("image"),
@@ -59,8 +59,8 @@ AdminRoute.post("/getAllComments",authMiddleware,getAllComments);
 AdminRoute.post("/deleteComment",authMiddleware,deleteComment)
 AdminRoute.post("/replyToComment",authMiddleware,createReply)
 AdminRoute.post("/getAllReplies",authMiddleware,getReplies)
-AdminRoute.get("/hideReply",authMiddleware,hideReply)
-AdminRoute.get("/unhideReply",authMiddleware,unhideReply)
+AdminRoute.post("/hideReply",authMiddleware,hideReply)
+AdminRoute.post("/unhideReply",authMiddleware,unhideReply)
 AdminRoute.post("/hideComment",authMiddleware,hideComment)
 AdminRoute.post("/unhideComment",authMiddleware,unhideComment)
 module.exports = AdminRoute;
