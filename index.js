@@ -3,10 +3,6 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-// controllers
-const contactSubmit = require("./Controller/Contact_controller.js");
-const { getAllBlogs } = require("./Controller/Blog_controller.js");
-
 // Routes
 const AdminRoute = require("./Routes/Admin_routes.js");
 const UserRoute = require("./Routes/User_routes.js");
