@@ -42,77 +42,7 @@ WHERE
 `;
     connection.query(query, [blogId], callback);
   }
-  //   static getCommentByBlogIdforAdmin(blogId, callback) {
-  //     const query = `SELECT
-  //     comments.id AS comment_id,
-  //     comments.comment AS comment,
-  //     comments.username AS comment_username,
-  //     comments.created_at AS comment_created_at,
-  //     (
-  //         SELECT
-  //             GROUP_CONCAT(
-  //                 CONCAT_WS(': ',
-  //                     replies.id,
-  //                     replies.reply,
-  //                     replies.username,
-  //                     replies.created_at
-  //                 )
-  //                 ORDER BY replies.created_at
-  //             )
-  //         FROM
-  //             replies
-  //         WHERE
-  //             replies.comment_id = comments.id
-  //     ) AS replies
-  // FROM
-  //     comments
-  // WHERE
-  //     comments.blog_id = ?;
-  // `;
-  //     connection.query(query, [blogId], callback);
-  //   }
-  // static async getAllComments(callback) {
-  //   try {
-  //             const query = `SELECT
-  //           comments.id AS comment_id,
-  //           comments.comment AS comment,
-  //           comments.username AS comment_username,
-  //           comments.created_at AS comment_created_at,
-  //           comments.is_hidden AS comment_is_hidden,
-  //           blogs.blog_title AS blog_title,
-  //           blogs.blog_author AS blog_author,
-  //           (
-  //               SELECT
-  //                   GROUP_CONCAT(
-  //                       CONCAT_WS('| ',
-  //                           replies.id,
-  //                           replies.reply,
-  //                           replies.username,
-  //                           replies.created_at,
-  //                           replies.is_hidden
-  //                       )
-  //                       ORDER BY replies.created_at
-  //                   )
-  //               FROM
-  //                   replies
-  //               WHERE
-  //                   replies.comment_id = comments.id
-  //                   AND replies.is_hidden = FALSE
-  //           ) AS replies
-  //       FROM
-  //           comments
-  //       JOIN
-  //           blogs
-  //       ON
-  //           comments.blog_id = blogs.id
-  //       ORDER BY
-  //           comments.id ASC`;
-  //     connection.query(query, callback);
-  //   } catch (error) {
-  //     console.error("Error fetching comments:", error);
-  //     callback(error, null);
-  //   }
-  // }
+
   static async getAllComments(role, callback) {
     try {
       // Adjust the query based on the user's role (admin or user)

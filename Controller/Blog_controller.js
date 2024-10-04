@@ -145,9 +145,9 @@ const deleteBlog = async (req, res) => {
 };
 const latestBlogs = async (req, res) => {
   try {
-    const blogs = await BlogModel.getLatestBlog();
+    const blogs = await BlogModel?.getLatestBlog();
     // console.log(blogs); // Adjusted to get the latest blog
-    if (blogs.length === 0) {
+    if (!blogs && blogs?.length == 0) {
       return res.status(404).json({ status: false, message: "No blogs found" });
     }
     return res.status(200).json({ status: true, blogs });
