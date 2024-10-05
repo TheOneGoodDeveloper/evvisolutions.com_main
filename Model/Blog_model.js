@@ -31,7 +31,14 @@ class BlogModel {
       const query = "SELECT * FROM blogs WHERE id = ?";
       connection.query(query, [id], (err, results) => {
         if (err) return reject(err);
-        resolve(results);
+
+        // After retrieving the blog, update the visitors count
+        const updateVisitorsQuery =
+          "UPDATE blogs SET blog_visitors_count = blog_visitors_count + 1 WHERE id = ?";
+        connection.query(updateVisitorsQuery, [id], (updateErr) => {
+          if (updateErr) return reject(updateErr);
+          resolve(results);
+        });
       });
     });
   }
@@ -61,8 +68,7 @@ class BlogModel {
     });
   }
   static getLatestBlog(callback) {
-    const query =' SELECT * FROM blogs ORDER BY blog_date DESC LIMIT 4';
-    ;
+    const query = " SELECT * FROM blogs ORDER BY blog_date DESC LIMIT 4";
     return new Promise((resolve, reject) => {
       connection.query(query, (err, results) => {
         if (err) {
